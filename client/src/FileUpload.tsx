@@ -62,15 +62,12 @@ function FileUpload() {
     }
 
     const stream = await navigator.mediaDevices.getDisplayMedia({
-      video: {
-        displaySurface: "monitor",
-      },
+      video: true,
       audio: {
         // @ts-ignore
         suppressLocalAudioPlayback: false,
       },
       systemAudio: "include",
-      surfaceSwitching: "include",
     });
 
     const mediaRecorder = new MediaRecorder(stream);
