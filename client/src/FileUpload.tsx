@@ -11,6 +11,7 @@ import UploadIcon from "./assets/upload.svg?react";
 import CloseIcon from "./assets/close.svg?react";
 import MicrophoneIcon from "./assets/microphone.svg?react";
 import StopRecordingIcon from "./assets/stop-recording.svg?react";
+import WarningIcon from "./assets/warning.svg?react";
 
 function FileUpload() {
   const { setFile } = useFileContext();
@@ -137,29 +138,41 @@ function FileUpload() {
         <h1 className="text-4xl underline decoration-primary">
           Convert a meeting into tasks with AI
         </h1>
-        <div className="w-full flex flex-col items-center gap-4">
+        <div className="w-full flex flex-col items-center gap-8">
           {browserSupportsRecording && (
             <>
-              <Button
-                additionalClasses="!gap-1.5 !py-3 w-fit"
-                onClick={recording ? handleStopRecording : handleRecord}
-              >
-                {recording ? (
-                  <>
-                    <StopRecordingIcon fill="white" />
-                    <span>Recording</span>
-                    <span className="ml-2 text-gray-200">
-                      {String(Math.floor(elapsedTime / 60)).padStart(2, "0")}:
-                      {String(elapsedTime % 60).padStart(2, "0")}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <MicrophoneIcon fill="white" />
-                    <span>Record Audio</span>
-                  </>
+              <div className="flex flex-col items-center gap-4 w-full">
+                <Button
+                  additionalClasses="!gap-1.5 !py-3 w-fit"
+                  onClick={recording ? handleStopRecording : handleRecord}
+                >
+                  {recording ? (
+                    <>
+                      <StopRecordingIcon fill="white" />
+                      <span>Recording</span>
+                      <span className="ml-2 text-gray-200">
+                        {String(Math.floor(elapsedTime / 60)).padStart(2, "0")}:
+                        {String(elapsedTime % 60).padStart(2, "0")}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <MicrophoneIcon fill="white" />
+                      <span>Record Audio</span>
+                    </>
+                  )}
+                </Button>
+                {!window.navigator.platform.includes("Win") && (
+                  <div className="max-w-[500px] flex items-center gap-4 p-4 bg-yellow-500/10 rounded-md text-white text-left">
+                    <WarningIcon className="min-w-5 w-5 min-h-5 h-5 fill-yellow-500" />
+                    <p className="text-sm">
+                      Only supports system audio from a single Chrome tab on
+                      Mac. If you'd like to record another app, consider using
+                      QuickTime Player.
+                    </p>
+                  </div>
                 )}
-              </Button>
+              </div>
               <p className="text-gray-500">OR</p>
             </>
           )}
