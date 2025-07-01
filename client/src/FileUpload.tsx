@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   type FileRejection,
   type FileWithPath,
@@ -9,11 +9,22 @@ import toast from "react-hot-toast";
 import { useFileContext } from "./contexts/FileContext";
 import UploadIcon from "./assets/upload.svg?react";
 import CloseIcon from "./assets/close.svg?react";
+import MicrophoneIcon from "./assets/microphone.svg?react";
+import StopRecordingIcon from "./assets/stop-recording.svg?react";
 
 function FileUpload() {
   const { setFile } = useFileContext();
 
+  const browserSupportsRecording = Boolean(
+    navigator.mediaDevices && navigator.mediaDevices.getUserMedia
+  );
+
   const [localFile, setLocalFile] = useState<FileWithPath>();
+  const [recording, setRecording] = useState<boolean>(false);
+  const [elapsedTime, setElapsedTime] = useState<number>(0);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
+    null
+  );
 
   const { getInputProps, getRootProps, isDragActive } = useDropzone({
     accept: {
@@ -36,7 +47,7 @@ function FileUpload() {
       }
       setLocalFile(acceptedFiles[0]);
     },
-    disabled: localFile !== undefined,
+    disabled: localFile !== undefined || recording,
   });
 
   function handleSubmitTranscript() {
@@ -44,17 +55,102 @@ function FileUpload() {
     setFile(localFile);
   }
 
+  async function handleRecord() {
+    if (!browserSupportsRecording) {
+      toast.error("Your browser does not support audio recording.");
+      return;
+    }
+
+    const stream = await navigator.mediaDevices.getDisplayMedia({
+      video: {
+        displaySurface: "monitor",
+      },
+      audio: {
+        // @ts-ignore
+        suppressLocalAudioPlayback: false,
+      },
+      systemAudio: "include",
+      surfaceSwitching: "include",
+    });
+
+    const mediaRecorder = new MediaRecorder(stream);
+
+    mediaRecorder.ondataavailable = (event) => {
+      const audioBlob = event.data;
+      const audioFile = new File([audioBlob], "recorded-audio.weba", {
+        type: "audio/weba",
+      });
+      setLocalFile(audioFile);
+      toast.success("Audio recorded successfully!");
+    };
+
+    setMediaRecorder(mediaRecorder);
+    setRecording(true);
+    mediaRecorder.start();
+  }
+
+  async function handleStopRecording() {
+    if (mediaRecorder) {
+      mediaRecorder.stop();
+      setRecording(false);
+      setMediaRecorder(null);
+    }
+  }
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout | null = null;
+
+    if (recording) {
+      timer = setInterval(() => {
+        setElapsedTime((prev) => prev + 1);
+      }, 1000);
+    } else {
+      setElapsedTime(0);
+    }
+
+    return () => {
+      if (timer) {
+        clearInterval(timer);
+      }
+    };
+  }, [recording]);
+
   return (
     <div className="w-full h-full flex justify-center items-center px-4">
       <div className="max-w-content-max-width w-full h-full flex flex-col items-center justify-center gap-15 text-center">
         <h1 className="text-4xl underline decoration-primary">
           Convert a meeting into tasks with AI
         </h1>
-        <div className="w-full flex flex-col gap-4">
+        <div className="w-full flex flex-col items-center gap-4">
+          {browserSupportsRecording && (
+            <>
+              <Button
+                additionalClasses="!gap-1.5 !py-3 w-fit"
+                onClick={recording ? handleStopRecording : handleRecord}
+              >
+                {recording ? (
+                  <>
+                    <StopRecordingIcon fill="white" />
+                    <span>Recording</span>
+                    <span className="ml-2 text-gray-200">
+                      {String(Math.floor(elapsedTime / 60)).padStart(2, "0")}:
+                      {String(elapsedTime % 60).padStart(2, "0")}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <MicrophoneIcon fill="white" />
+                    <span>Record Audio</span>
+                  </>
+                )}
+              </Button>
+              <p className="text-gray-500">OR</p>
+            </>
+          )}
           <div
             {...getRootProps()}
             className={`w-full p-10 flex flex-col items-center gap-10 border-2 border-dashed border-gray-300 rounded-md transition-all duration-100 ${
-              !localFile && "hover:bg-gray-800 cursor-pointer"
+              !localFile && !recording && "hover:bg-gray-800 cursor-pointer"
             }`}
           >
             <input {...getInputProps()} />

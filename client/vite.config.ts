@@ -16,5 +16,6 @@ export default defineConfig({
         target: "http://localhost:3001",
       },
     },
+    allowedHosts: ["1b03-185-199-103-83.ngrok-free.app"],
   },
 });
