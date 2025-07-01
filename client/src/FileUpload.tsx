@@ -168,7 +168,7 @@ function FileUpload() {
                     <p className="text-sm">
                       Only supports system audio from a single Chrome tab on
                       Mac. If you'd like to record another app, consider using
-                      QuickTime Player.
+                      another recording tool and uploading the file.
                     </p>
                   </div>
                 )}
