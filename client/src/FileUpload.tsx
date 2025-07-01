@@ -61,7 +61,7 @@ function FileUpload() {
       return;
     }
 
-    const stream = await navigator.mediaDevices.getDisplayMedia({
+    const screenStream = await navigator.mediaDevices.getDisplayMedia({
       video: true,
       audio: {
         // @ts-ignore
@@ -70,10 +70,29 @@ function FileUpload() {
       systemAudio: "include",
     });
 
-    const mediaRecorder = new MediaRecorder(stream);
+    const audioStream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: false,
+    });
+
+    const audioContext = new AudioContext();
+    const screenSource = audioContext.createMediaStreamSource(screenStream);
+    const audioSource = audioContext.createMediaStreamSource(audioStream);
+    const destination = audioContext.createMediaStreamDestination();
+    screenSource.connect(destination);
+    audioSource.connect(destination);
+
+    const combinedStream = new MediaStream([
+      ...destination.stream.getAudioTracks(),
+    ]);
+
+    const mediaRecorder = new MediaRecorder(combinedStream);
 
     mediaRecorder.ondataavailable = (event) => {
-      const audioBlob = event.data;
+      console.log("Audio data available:", event);
+      const audioBlob = new Blob([event.data], {
+        type: "audio/weba",
+      });
       const audioFile = new File([audioBlob], "recorded-audio.weba", {
         type: "audio/weba",
       });

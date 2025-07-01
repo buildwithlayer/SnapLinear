@@ -6,6 +6,7 @@ import { useMessagesContext } from "./contexts/MessagesContext";
 import Button from "./components/Button";
 import UpArrowIcon from "./assets/uparrow.svg?react";
 import { useLinearContext } from "./contexts/LinearContext";
+import ResetButton from "./components/ResetButton";
 
 interface Step {
   label: string;
@@ -74,6 +75,7 @@ const Progress = () => {
   return (
     <div className="w-full h-full max-w-content-max-width px-4">
       <div className="flex flex-col gap-4 items-center justify-center w-full h-full py-10">
+        <ResetButton />
         <Step
           label={"Transcribing File"}
           loading={transcriptLoading}

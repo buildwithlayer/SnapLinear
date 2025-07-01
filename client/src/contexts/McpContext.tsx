@@ -14,8 +14,8 @@ const McpContext = createContext<McpContextType>({});
 export const McpProvider = ({ children }: { children: ReactNode }) => {
   const { callTool, state, tools, error, retry, authenticate } = useMcp({
     autoReconnect: true,
-    // callbackUrl: import.meta.env.VITE_CALLBACK_URL,
-    callbackUrl: "https://1b03-185-199-103-83.ngrok-free.app/oauth/callback",
+    callbackUrl: import.meta.env.VITE_CALLBACK_URL,
+    // callbackUrl: "https://1b03-185-199-103-83.ngrok-free.app/oauth/callback",
     clientName: "SnapLinear",
     url: "https://mcp.linear.app/sse",
   });
