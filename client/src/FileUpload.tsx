@@ -8,10 +8,11 @@ import Button from "./components/Button";
 import toast from "react-hot-toast";
 import { useFileContext } from "./contexts/FileContext";
 import UploadIcon from "./assets/upload.svg?react";
-import CloseIcon from "./assets/close.svg?react";
+import DeleteIcon from "./assets/delete.svg?react";
 import MicrophoneIcon from "./assets/microphone.svg?react";
 import StopRecordingIcon from "./assets/stop-recording.svg?react";
 import WarningIcon from "./assets/warning.svg?react";
+import FileIcon from "./assets/file.svg?react";
 
 function FileUpload() {
   const { setFile } = useFileContext();
@@ -133,17 +134,39 @@ function FileUpload() {
   }, [recording]);
 
   return (
-    <div className="w-full h-full flex justify-center items-center px-4">
-      <div className="max-w-content-max-width w-full h-full flex flex-col items-center justify-center gap-15 text-center">
-        <h1 className="text-4xl underline decoration-primary">
-          Convert a meeting into tasks with AI
-        </h1>
-        <div className="w-full flex flex-col items-center gap-8">
-          {browserSupportsRecording && (
-            <>
-              <div className="flex flex-col items-center gap-4 w-full">
+    <>
+      <div className="w-full flex flex-col items-center justify-center gap-4">
+        {localFile ? (
+          <>
+            {/* File Uploaded */}
+            {localFile && (
+              <div className="w-full flex gap-6 justify-between items-center rounded-md bg-gray-700 pl-4 pr-3 py-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <FileIcon className="w-6 h-6 fill-white" />
+                  <span className="text-left">{localFile.name}</span>
+                </div>
+                <button
+                  onClick={() => setLocalFile(undefined)}
+                  className="rounded-full hover:bg-white/10 cursor-pointer p-1"
+                >
+                  <DeleteIcon className="fill-white w-6 h-6" />
+                </button>
+              </div>
+            )}
+            <Button
+              disabled={!localFile}
+              additionalClasses="w-full py-3"
+              onClick={handleSubmitTranscript}
+            >
+              Generate Linear Action Items
+            </Button>
+          </>
+        ) : (
+          <>
+            <div className="w-full flex flex-col md:flex-row items-center justify-center gap-4">
+              {browserSupportsRecording && (
                 <Button
-                  additionalClasses="!gap-1.5 !py-3 w-fit"
+                  additionalClasses="!gap-1.5 !py-3 w-full"
                   onClick={recording ? handleStopRecording : handleRecord}
                 >
                   {recording ? (
@@ -162,64 +185,45 @@ function FileUpload() {
                     </>
                   )}
                 </Button>
-                {!window.navigator.platform.includes("Win") && (
-                  <div className="max-w-[500px] flex items-center gap-4 p-4 bg-yellow-500/10 rounded-md text-white text-left">
-                    <WarningIcon className="min-w-5 w-5 min-h-5 h-5 fill-yellow-500" />
-                    <p className="text-sm">
-                      Only supports system audio from a single Chrome tab on
-                      Mac. If you'd like to record another app, consider using
-                      another recording tool and uploading the file.
-                    </p>
-                  </div>
-                )}
-              </div>
-              <p className="text-gray-500">OR</p>
-            </>
-          )}
-          <div
-            {...getRootProps()}
-            className={`w-full p-10 flex flex-col items-center gap-10 border-2 border-dashed border-gray-300 rounded-md transition-all duration-100 ${
-              !localFile && !recording && "hover:bg-gray-800 cursor-pointer"
-            }`}
-          >
-            <input {...getInputProps()} />
-            {/* TODO: Add upload icon */}
-            <UploadIcon fill="white" scale={72} />
-            {!localFile && (
-              <div className="flex flex-col gap-2">
-                <h3 className="text-xl text-gray-200">
-                  {isDragActive
-                    ? "Drop the file here"
-                    : "Upload Audio or Transcription file"}
-                </h3>
-                <p className="text-gray-400 text-sm">
-                  Supported file types: .aac, .mp3, .oga, .opus, .wav, .weba,
-                  .md, .txt
-                </p>
-              </div>
-            )}
-            {localFile && (
-              <div className="flex gap-5 items-center rounded-full bg-gray-700 pl-4 pr-3 py-2 text-sm">
-                {localFile.name}
-                <button
-                  onClick={() => setLocalFile(undefined)}
-                  className="rounded-full bg-white cursor-pointer hover:bg-gray-200 p-0.5"
+              )}
+              <div
+                {...getRootProps()}
+                className="w-full flex items-center justify-center"
+              >
+                <input {...getInputProps()} />
+                <Button
+                  additionalClasses="!gap-1.5 !py-3 w-full"
+                  disabled={recording}
                 >
-                  <CloseIcon className="fill-gray-800 w-5 h-5" />
-                </button>
+                  <UploadIcon
+                    className={`w-6 h-6 ${
+                      recording ? "fill-gray-800" : "fill-white"
+                    }`}
+                  />
+                  <span>
+                    {isDragActive
+                      ? "Drop the file here"
+                      : "Upload Audio or Transcript"}
+                  </span>
+                </Button>
               </div>
-            )}
-          </div>
-          <Button
-            disabled={!localFile}
-            additionalClasses="w-full py-3"
-            onClick={handleSubmitTranscript}
-          >
-            Generate Linear Action Items
-          </Button>
-        </div>
+            </div>
+            {/* Recording disclaimer */}
+            {browserSupportsRecording &&
+              !window.navigator.platform.includes("Win") && (
+                <div className="flex items-center gap-4 p-4 bg-yellow-500/10 rounded-md text-white text-left">
+                  <WarningIcon className="min-w-5 w-5 min-h-5 h-5 fill-yellow-500" />
+                  <p className="text-sm text-gray-300">
+                    Only Chrome tab audio is supported on Mac for direct
+                    recording. To capture meetings in other apps, record with
+                    another tool (e.g., Zoom, OBS) and upload the file here.
+                  </p>
+                </div>
+              )}
+          </>
+        )}
       </div>
-    </div>
+    </>
   );
 }
 

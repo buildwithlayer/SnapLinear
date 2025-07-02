@@ -5,7 +5,7 @@ import { LinearProvider } from "./contexts/LinearContext";
 import { McpProvider } from "./contexts/McpContext";
 import { MessagesContext, MessagesProvider } from "./contexts/MessagesContext";
 import { useTranscriptContext } from "./contexts/TranscriptContext";
-import FileUpload from "./FileUpload";
+import LandingPage from "./LandingPage";
 import Progress from "./Progress";
 import Review from "./Review";
 
@@ -15,7 +15,7 @@ const Content = () => {
 
   return (
     <div className="w-full h-full flex justify-center bg-gray-950 text-white overflow-hidden">
-      {!file && !transcript && <FileUpload />}
+      {!file && !transcript && <LandingPage />}
       {(file || transcript) && (
         <McpProvider>
           <LinearProvider>
