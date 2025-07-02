@@ -1,10 +1,10 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import MenuBar from "./MenuBar.tsx";
-import OAuthCallback from "./OAuthCallback.tsx";
-import { TranscriptProvider } from "./contexts/TranscriptContext.tsx";
-import Content from "./Content.tsx";
-import { Toaster } from "react-hot-toast";
-import { FileProvider } from "./contexts/FileContext.tsx";
+import { Toaster } from 'react-hot-toast';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Content from './Content.tsx';
+import { FileProvider } from './contexts/FileContext.tsx';
+import { TranscriptProvider } from './contexts/TranscriptContext.tsx';
+import MenuBar from './MenuBar.tsx';
+import OAuthCallback from './OAuthCallback.tsx';
 
 function App() {
   return (
@@ -12,9 +12,9 @@ function App() {
       <MenuBar />
       <Router>
         <Routes>
-          <Route path={"/oauth/callback"} element={<OAuthCallback />} />
+          <Route path={'/oauth/callback'} element={<OAuthCallback />} />
           <Route
-            path={"/"}
+            path={'/'}
             element={
               <FileProvider>
                 <TranscriptProvider>

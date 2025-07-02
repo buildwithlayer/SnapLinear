@@ -1,6 +1,6 @@
-import { useEffect } from "react";
-import toast from "react-hot-toast";
-import { onMcpAuthorization } from "use-mcp";
+import { useEffect } from 'react';
+import toast from 'react-hot-toast';
+import { onMcpAuthorization } from 'use-mcp';
 
 function OAuthCallback() {
   useEffect(() => {

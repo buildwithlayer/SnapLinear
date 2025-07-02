@@ -1,21 +1,21 @@
 import {
   createContext,
+  type ReactNode,
   useContext,
   useEffect,
   useState,
-  type ReactNode,
-} from "react";
-import type { BaseTeam, Project, Team, User } from "../linearTypes";
-import { useMcpContext } from "./McpContext";
-import toast from "react-hot-toast";
+} from 'react';
+import toast from 'react-hot-toast';
+import type { BaseTeam, Project, Team, User } from '../linearTypes';
+import { useMcpContext } from './McpContext';
 
 interface LinearContextType {
-  users?: User[];
-  projects?: Project[];
-  teams?: Team[];
+  error?: Error;
   fetchLinearData: () => Promise<void>;
   loading: boolean;
-  error?: Error;
+  projects?: Project[];
+  teams?: Team[];
+  users?: User[];
 }
 
 const LinearContext = createContext<LinearContextType>({
@@ -40,21 +40,21 @@ export const LinearProvider = ({ children }: { children: ReactNode }) => {
     try {
       const [usersResponse, projectsResponse, teamsResponse] =
         await Promise.all([
-          callTool("list_users", {}),
-          callTool("list_projects", {}),
-          callTool("list_teams", {}),
+          callTool('list_users', {}),
+          callTool('list_projects', {}),
+          callTool('list_teams', {}),
         ]);
 
       if (usersResponse) {
         const usersContent = JSON.parse(usersResponse.content[0].text);
-        localStorage.setItem("linear_users", JSON.stringify(usersContent));
+        localStorage.setItem('linear_users', JSON.stringify(usersContent));
         setUsers(usersContent);
       }
       if (projectsResponse) {
         const projectsContent = JSON.parse(projectsResponse.content[0].text);
         localStorage.setItem(
-          "linear_projects",
-          JSON.stringify(projectsContent)
+          'linear_projects',
+          JSON.stringify(projectsContent),
         );
         setProjects(projectsContent);
       }
@@ -62,29 +62,29 @@ export const LinearProvider = ({ children }: { children: ReactNode }) => {
         const teamsContent = JSON.parse(teamsResponse.content[0].text);
         const teams = await Promise.all(
           teamsContent.map(async (baseTeam: BaseTeam) => {
-            let team: Team = {
+            const team: Team = {
               ...baseTeam,
               issueLabels: [],
               issueStatuses: [],
             };
-            const getIssueLabels = await callTool("list_issue_labels", {
+            const getIssueLabels = await callTool('list_issue_labels', {
               teamId: team.id,
             });
-            const getIssueStatuses = await callTool("list_issue_statuses", {
+            const getIssueStatuses = await callTool('list_issue_statuses', {
               teamId: team.id,
             });
             team.issueLabels = JSON.parse(getIssueLabels.content[0].text);
             team.issueStatuses = JSON.parse(getIssueStatuses.content[0].text);
 
             return team;
-          })
+          }),
         );
-        localStorage.setItem("linear_teams", JSON.stringify(teams));
+        localStorage.setItem('linear_teams', JSON.stringify(teams));
         setTeams(teams);
       }
     } catch (error) {
-      console.error("Error fetching Linear data:", error);
-      toast.error("Failed to fetch Linear data. Please try again later.");
+      console.error('Error fetching Linear data:', error);
+      toast.error('Failed to fetch Linear data. Please try again later.');
       setError(error as Error);
     }
 
@@ -92,9 +92,9 @@ export const LinearProvider = ({ children }: { children: ReactNode }) => {
   }
 
   useEffect(() => {
-    const storedUsers = localStorage.getItem("linear_users");
-    const storedProjects = localStorage.getItem("linear_projects");
-    const storedTeams = localStorage.getItem("linear_teams");
+    const storedUsers = localStorage.getItem('linear_users');
+    const storedProjects = localStorage.getItem('linear_projects');
+    const storedTeams = localStorage.getItem('linear_teams');
 
     if (storedUsers) {
       setUsers(JSON.parse(storedUsers));
@@ -110,12 +110,12 @@ export const LinearProvider = ({ children }: { children: ReactNode }) => {
   return (
     <LinearContext.Provider
       value={{
-        users,
-        projects,
-        teams,
+        error,
         fetchLinearData,
         loading,
-        error,
+        projects,
+        teams,
+        users,
       }}
     >
       {children}

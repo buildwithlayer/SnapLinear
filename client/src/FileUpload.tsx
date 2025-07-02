@@ -1,55 +1,55 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import {
   type FileRejection,
   type FileWithPath,
   useDropzone,
-} from "react-dropzone";
-import Button from "./components/Button";
-import toast from "react-hot-toast";
-import { useFileContext } from "./contexts/FileContext";
-import UploadIcon from "./assets/upload.svg?react";
-import DeleteIcon from "./assets/delete.svg?react";
-import MicrophoneIcon from "./assets/microphone.svg?react";
-import StopRecordingIcon from "./assets/stop-recording.svg?react";
-import WarningIcon from "./assets/warning.svg?react";
-import FileIcon from "./assets/file.svg?react";
+} from 'react-dropzone';
+import toast from 'react-hot-toast';
+import DeleteIcon from './assets/delete.svg?react';
+import FileIcon from './assets/file.svg?react';
+import MicrophoneIcon from './assets/microphone.svg?react';
+import StopRecordingIcon from './assets/stop-recording.svg?react';
+import UploadIcon from './assets/upload.svg?react';
+import WarningIcon from './assets/warning.svg?react';
+import Button from './components/Button';
+import { useFileContext } from './contexts/FileContext';
 
 function FileUpload() {
   const { setFile } = useFileContext();
 
   const browserSupportsRecording = Boolean(
-    navigator.mediaDevices && navigator.mediaDevices.getUserMedia
+    navigator.mediaDevices && navigator.mediaDevices.getUserMedia,
   );
 
   const [localFile, setLocalFile] = useState<FileWithPath>();
   const [recording, setRecording] = useState<boolean>(false);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
-    null
+    null,
   );
 
   const { getInputProps, getRootProps, isDragActive } = useDropzone({
     accept: {
-      "audio/aac": [".aac"],
-      "audio/mpeg": [".mp3"],
-      "audio/ogg": [".oga", ".opus"],
-      "audio/wav": [".wav"],
-      "audio/webm": [".weba"],
-      "text/markdown": [".md"],
-      "text/plain": [".txt"],
+      'audio/aac': ['.aac'],
+      'audio/mpeg': ['.mp3'],
+      'audio/ogg': ['.oga', '.opus'],
+      'audio/wav': ['.wav'],
+      'audio/webm': ['.weba'],
+      'text/markdown': ['.md'],
+      'text/plain': ['.txt'],
     },
+    disabled: localFile !== undefined || recording,
     maxFiles: 1,
     onDrop: (
       acceptedFiles: readonly FileWithPath[],
-      fileRejections: FileRejection[]
+      fileRejections: FileRejection[],
     ) => {
       if (fileRejections.length > 0) {
-        toast.error(`Unsupported file type`);
+        toast.error('Unsupported file type');
         return;
       }
       setLocalFile(acceptedFiles[0]);
     },
-    disabled: localFile !== undefined || recording,
   });
 
   function handleSubmitTranscript() {
@@ -59,17 +59,17 @@ function FileUpload() {
 
   async function handleRecord() {
     if (!browserSupportsRecording) {
-      toast.error("Your browser does not support audio recording.");
+      toast.error('Your browser does not support audio recording.');
       return;
     }
 
     const screenStream = await navigator.mediaDevices.getDisplayMedia({
-      video: true,
       audio: {
-        // @ts-ignore
+        // @ts-expect-error This isn't included in the type definition
         suppressLocalAudioPlayback: false,
       },
-      systemAudio: "include",
+      systemAudio: 'include',
+      video: true,
     });
 
     const audioStream = await navigator.mediaDevices.getUserMedia({
@@ -91,15 +91,15 @@ function FileUpload() {
     const mediaRecorder = new MediaRecorder(combinedStream);
 
     mediaRecorder.ondataavailable = (event) => {
-      console.log("Audio data available:", event);
+      console.log('Audio data available:', event);
       const audioBlob = new Blob([event.data], {
-        type: "audio/weba",
+        type: 'audio/weba',
       });
-      const audioFile = new File([audioBlob], "recorded-audio.weba", {
-        type: "audio/weba",
+      const audioFile = new File([audioBlob], 'recorded-audio.weba', {
+        type: 'audio/weba',
       });
       setLocalFile(audioFile);
-      toast.success("Audio recorded successfully!");
+      toast.success('Audio recorded successfully!');
     };
 
     setMediaRecorder(mediaRecorder);
@@ -174,8 +174,8 @@ function FileUpload() {
                       <StopRecordingIcon fill="white" />
                       <span>Recording</span>
                       <span className="ml-2 text-gray-200">
-                        {String(Math.floor(elapsedTime / 60)).padStart(2, "0")}:
-                        {String(elapsedTime % 60).padStart(2, "0")}
+                        {String(Math.floor(elapsedTime / 60)).padStart(2, '0')}:
+                        {String(elapsedTime % 60).padStart(2, '0')}
                       </span>
                     </>
                   ) : (
@@ -197,20 +197,20 @@ function FileUpload() {
                 >
                   <UploadIcon
                     className={`w-6 h-6 ${
-                      recording ? "fill-gray-800" : "fill-white"
+                      recording ? 'fill-gray-800' : 'fill-white'
                     }`}
                   />
                   <span>
                     {isDragActive
-                      ? "Drop the file here"
-                      : "Upload Audio or Transcript"}
+                      ? 'Drop the file here'
+                      : 'Upload Audio or Transcript'}
                   </span>
                 </Button>
               </div>
             </div>
             {/* Recording disclaimer */}
             {browserSupportsRecording &&
-              !window.navigator.platform.includes("Win") && (
+              !window.navigator.platform.includes('Win') && (
                 <div className="flex items-center gap-4 p-4 bg-yellow-500/10 rounded-md text-white text-left">
                   <WarningIcon className="min-w-5 w-5 min-h-5 h-5 fill-yellow-500" />
                   <p className="text-sm text-gray-300">

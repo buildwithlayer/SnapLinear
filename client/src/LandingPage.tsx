@@ -1,4 +1,4 @@
-import FileUpload from "./FileUpload";
+import FileUpload from './FileUpload';
 
 const LandingPage = () => {
   return (
@@ -25,7 +25,7 @@ const LandingPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full text-left pb-1">
                 <div className="bg-gray-900 p-4 rounded flex flex-col gap-2">
                   <h3 className="font-semibold whitespace-pre">
-                    🔍{"  "}Smart Action Item Detection
+                    🔍{'  '}Smart Action Item Detection
                   </h3>
                   <p className="text-gray-300">
                     Our AI listens to meetings or reads transcripts to identify
@@ -34,7 +34,7 @@ const LandingPage = () => {
                 </div>
                 <div className="bg-gray-900 p-4 rounded flex flex-col gap-2">
                   <h3 className="font-semibold whitespace-pre">
-                    🔄{"  "}Seamless Linear Integration
+                    🔄{'  '}Seamless Linear Integration
                   </h3>
                   <p className="text-gray-300">
                     Automatically create Linear issues or comments directly from
@@ -43,7 +43,7 @@ const LandingPage = () => {
                 </div>
                 <div className="bg-gray-900 p-4 rounded flex flex-col gap-2">
                   <h3 className="font-semibold whitespace-pre">
-                    🔐{"  "}Private & Secure
+                    🔐{'  '}Private & Secure
                   </h3>
                   <p className="text-gray-300">
                     Your audio and text data stay private. We never train on
@@ -52,7 +52,7 @@ const LandingPage = () => {
                 </div>
                 <div className="bg-gray-900 p-4 rounded flex flex-col gap-2">
                   <h3 className="font-semibold whitespace-pre">
-                    🎧{"  "}Flexible Input Options
+                    🎧{'  '}Flexible Input Options
                   </h3>
                   <p className="text-gray-300">
                     Record a meeting directly in your browser or upload your own

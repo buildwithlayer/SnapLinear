@@ -1,4 +1,4 @@
-import Logo from "./assets/snaplinear.svg?react";
+import Logo from './assets/snaplinear.svg?react';
 
 function MenuBar() {
   return (

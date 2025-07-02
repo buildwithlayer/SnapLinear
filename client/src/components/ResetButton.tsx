@@ -1,21 +1,21 @@
-import Button from "./Button";
-import RestartIcon from "../assets/restart.svg?react";
+import RestartIcon from '../assets/restart.svg?react';
+import Button from './Button';
 
 const ResetButton = () => {
   const handleReset = () => {
     [
-      "transcript",
-      "messages",
-      "incompleteToolCalls",
-      "issueToolCalls",
-      "approvedIssues",
-      "rejectedIssues",
-      "commentToolCalls",
-      "approvedComments",
-      "rejectedComments",
-      "linear_users",
-      "linear_projects",
-      "linear_teams",
+      'transcript',
+      'messages',
+      'incompleteToolCalls',
+      'issueToolCalls',
+      'approvedIssues',
+      'rejectedIssues',
+      'commentToolCalls',
+      'approvedComments',
+      'rejectedComments',
+      'linear_users',
+      'linear_projects',
+      'linear_teams',
     ].forEach((k) => localStorage.removeItem(k));
 
     window.location.reload();

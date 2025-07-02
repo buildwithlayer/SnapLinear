@@ -1,45 +1,45 @@
-import { useEffect, useState } from "react";
-import { useFileContext } from "./contexts/FileContext";
-import { ClipLoader } from "react-spinners";
-import { useTranscriptContext } from "./contexts/TranscriptContext";
-import { useMessagesContext } from "./contexts/MessagesContext";
-import Button from "./components/Button";
-import UpArrowIcon from "./assets/uparrow.svg?react";
-import { useLinearContext } from "./contexts/LinearContext";
-import ResetButton from "./components/ResetButton";
+import { useEffect, useState } from 'react';
+import { ClipLoader } from 'react-spinners';
+import UpArrowIcon from './assets/uparrow.svg?react';
+import Button from './components/Button';
+import ResetButton from './components/ResetButton';
+import { useFileContext } from './contexts/FileContext';
+import { useLinearContext } from './contexts/LinearContext';
+import { useMessagesContext } from './contexts/MessagesContext';
+import { useTranscriptContext } from './contexts/TranscriptContext';
 
 interface Step {
-  label: string;
-  start: boolean;
-  loading: boolean;
-  fn: () => void;
-  error?: Error;
-  complete: boolean;
   additionalMessage?: string;
+  complete: boolean;
+  error?: Error;
+  fn: () => void;
+  label: string;
+  loading: boolean;
+  start: boolean;
 }
 
 const Progress = () => {
   const { file } = useFileContext();
   const {
+    error: transcriptError,
+    loading: transcriptLoading,
     transcribeFile,
     transcript,
-    loading: transcriptLoading,
-    error: transcriptError,
   } = useTranscriptContext();
   const {
-    users,
-    projects,
-    teams,
+    error: linearError,
     fetchLinearData,
     loading: linearLoading,
-    error: linearError,
+    projects,
+    teams,
+    users,
   } = useLinearContext();
   const {
-    messages,
+    awaitingResponse,
+    error: messagesError,
     getResponse,
     loading: messagesLoading,
-    error: messagesError,
-    awaitingResponse,
+    messages,
     readToolCallStack,
   } = useMessagesContext();
 
@@ -51,24 +51,24 @@ const Progress = () => {
     : undefined;
   const currentlyCallingString = currentlyCallingTool
     ? `Calling ${currentlyCallingTool.function.name}${
-        currentlyCallingTool.function.name === "list_issues" &&
+        currentlyCallingTool.function.name === 'list_issues' &&
         currentlyCallingToolArguments &&
-        "query" in currentlyCallingToolArguments
+        'query' in currentlyCallingToolArguments
           ? ` with query "${currentlyCallingToolArguments.query}"`
-          : ""
+          : ''
       }...`
-    : "Thinking...";
+    : 'Thinking...';
 
-  const [userMessage, setUserMessage] = useState<string>("");
+  const [userMessage, setUserMessage] = useState<string>('');
   const [inputFocused, setInputFocused] = useState<boolean>(false);
 
   const sendDisabled =
-    userMessage.trim() === "" || messages[messages.length - 1]?.role === "user";
+    userMessage.trim() === '' || messages[messages.length - 1]?.role === 'user';
 
   function handleSendMessage() {
     if (!sendDisabled) {
       getResponse(userMessage);
-      setUserMessage("");
+      setUserMessage('');
     }
   }
 
@@ -77,19 +77,19 @@ const Progress = () => {
       <div className="flex flex-col gap-4 items-center justify-center w-full h-full py-10">
         <ResetButton />
         <Step
-          label={"Transcribing File"}
+          label={'Transcribing File'}
           loading={transcriptLoading}
           start={
             file !== undefined &&
             !transcript &&
-            !localStorage.getItem("transcript")
+            !localStorage.getItem('transcript')
           }
           error={transcriptError}
           fn={transcribeFile}
           complete={transcript !== undefined && !transcriptError}
         />
         <Step
-          label={"Getting Linear Workspace Data"}
+          label={'Getting Linear Workspace Data'}
           loading={linearLoading}
           start={transcript !== undefined && messages.length === 1}
           error={linearError}
@@ -102,7 +102,7 @@ const Progress = () => {
           }
         />
         <Step
-          label={"Generating Linear Action Items"}
+          label={'Generating Linear Action Items'}
           loading={messagesLoading}
           start={
             users !== undefined &&
@@ -124,27 +124,27 @@ const Progress = () => {
                 .filter(
                   (message, index) =>
                     index > 0 &&
-                    (typeof message.content === "string" ||
+                    (typeof message.content === 'string' ||
                       message.content?.some(
-                        (content) => content.type === "text"
+                        (content) => content.type === 'text',
                       )) &&
-                    (message.role === "assistant" || message.role === "user")
+                    (message.role === 'assistant' || message.role === 'user'),
                 )
                 .map((message, index) => {
                   return (
                     <div
                       className={`max-w-full w-fit overflow-y-auto rounded-md p-4 ${
-                        message.role === "assistant"
-                          ? "bg-gray-800 self-start"
-                          : "bg-primary self-end"
+                        message.role === 'assistant'
+                          ? 'bg-gray-800 self-start'
+                          : 'bg-primary self-end'
                       }`}
                       key={index}
                     >
-                      {typeof message.content === "string" ? (
+                      {typeof message.content === 'string' ? (
                         <p key={index}>{message.content}</p>
                       ) : (
                         message.content
-                          ?.filter((content) => content.type === "text")
+                          ?.filter((content) => content.type === 'text')
                           .map((content, idx) => (
                             <p key={idx}>{content.text}</p>
                           ))
@@ -155,7 +155,7 @@ const Progress = () => {
             </div>
             <div
               className={`flex items-center p-2 pr-3 rounded-full bg-gray-900 border ${
-                inputFocused ? "border-primary" : "border-gray-700"
+                inputFocused ? 'border-primary' : 'border-gray-700'
               }`}
             >
               <input
@@ -167,7 +167,7 @@ const Progress = () => {
                 onFocus={() => setInputFocused(true)}
                 onBlur={() => setInputFocused(false)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") {
+                  if (e.key === 'Enter') {
                     handleSendMessage();
                   }
                 }}
@@ -188,19 +188,19 @@ const Progress = () => {
 };
 
 const Step = ({
-  label,
-  start,
-  loading,
-  fn,
-  error,
-  complete,
   additionalMessage,
+  complete,
+  error,
+  fn,
+  label,
+  loading,
+  start,
 }: Step) => {
   useEffect(() => {
     if (start && !loading && !error && !complete) {
       fn();
     }
-  }, [start, loading, error]);
+  }, [start, loading, error, complete, fn]);
 
   return (
     <>
@@ -211,7 +211,7 @@ const Step = ({
             {/* TODO: Switch to icons */}
             {complete && <p className="text-gray-500">✓</p>}
             {error && <p className="text-red-500">❌</p>}
-            <p className={`${complete ? "text-gray-500" : "text-white"}`}>
+            <p className={`${complete ? 'text-gray-500' : 'text-white'}`}>
               {label}
             </p>
           </div>

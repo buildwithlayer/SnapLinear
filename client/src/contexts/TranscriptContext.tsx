@@ -1,23 +1,23 @@
 import {
   createContext,
+  type ReactNode,
   useContext,
   useEffect,
   useState,
-  type ReactNode,
-} from "react";
-import toast from "react-hot-toast";
-import { useFileContext } from "./FileContext";
+} from 'react';
+import toast from 'react-hot-toast';
+import { useFileContext } from './FileContext';
 
 interface TranscriptContextType {
-  transcript?: string;
-  transcribeFile: () => Promise<void>;
-  loading: boolean;
   error?: Error;
+  loading: boolean;
+  transcribeFile: () => Promise<void>;
+  transcript?: string;
 }
 
 const TranscriptContext = createContext<TranscriptContextType>({
-  transcribeFile: async () => {},
   loading: false,
+  transcribeFile: async () => {},
 });
 
 export const TranscriptProvider = ({ children }: { children: ReactNode }) => {
@@ -28,7 +28,7 @@ export const TranscriptProvider = ({ children }: { children: ReactNode }) => {
   const [error, setError] = useState<Error | undefined>(undefined);
 
   useEffect(() => {
-    const storedTranscript = localStorage.getItem("transcript");
+    const storedTranscript = localStorage.getItem('transcript');
     if (storedTranscript) {
       setTranscript(storedTranscript);
     }
@@ -40,23 +40,23 @@ export const TranscriptProvider = ({ children }: { children: ReactNode }) => {
     setTranscript(undefined);
     setLoading(true);
 
-    if (file.type.startsWith("audio")) {
+    if (file.type.startsWith('audio')) {
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append('file', file);
 
       fetch(`${import.meta.env.VITE_API_URL}/api/transcribe`, {
         body: formData,
-        method: "POST",
+        method: 'POST',
       })
         .then(async (response) => {
           if (response.ok) {
             const data = (await response.json()) as string;
-            localStorage.setItem("transcript", data);
+            localStorage.setItem('transcript', data);
             setTranscript(data);
           } else {
             console.error(await response.text());
-            toast.error("Could not transcribe audio");
-            setError(new Error("Could not transcribe audio"));
+            toast.error('Could not transcribe audio');
+            setError(new Error('Could not transcribe audio'));
           }
         })
         .catch((err) => {
@@ -67,21 +67,21 @@ export const TranscriptProvider = ({ children }: { children: ReactNode }) => {
         .finally(() => {
           setLoading(false);
         });
-    } else if (file.type.startsWith("text")) {
+    } else if (file.type.startsWith('text')) {
       const reader = new FileReader();
 
       reader.onabort = () => {
-        console.error("File reading was aborted");
-        toast.error("File reading was aborted");
+        console.error('File reading was aborted');
+        toast.error('File reading was aborted');
       };
       reader.onerror = () => {
-        console.error("File reading was aborted");
-        toast.error("File reading was aborted");
+        console.error('File reading was aborted');
+        toast.error('File reading was aborted');
       };
       reader.onload = () => {
         const content = reader.result;
-        if (typeof content === "string") {
-          localStorage.setItem("transcript", content);
+        if (typeof content === 'string') {
+          localStorage.setItem('transcript', content);
           setTranscript(content);
         }
       };
@@ -95,10 +95,10 @@ export const TranscriptProvider = ({ children }: { children: ReactNode }) => {
   return (
     <TranscriptContext.Provider
       value={{
-        transcript,
-        transcribeFile,
-        loading,
         error,
+        loading,
+        transcribeFile,
+        transcript,
       }}
     >
       {children}

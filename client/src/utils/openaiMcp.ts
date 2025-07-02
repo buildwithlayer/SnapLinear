@@ -2,9 +2,9 @@ import {
   type CallToolResult,
   McpError,
   type TextContent,
-} from "@modelcontextprotocol/sdk/types.js";
-import { OpenAI } from "openai/client";
-import { type Tool, type UseMcpResult } from "use-mcp/react";
+} from '@modelcontextprotocol/sdk/types.js';
+import { OpenAI } from 'openai/client';
+import { type Tool, type UseMcpResult } from 'use-mcp/react';
 
 export function convertTools(tools: Tool[]): OpenAI.ChatCompletionTool[] {
   return tools.map((tool) => {
@@ -14,11 +14,11 @@ export function convertTools(tools: Tool[]): OpenAI.ChatCompletionTool[] {
         name: tool.name,
         parameters: tool.inputSchema,
       },
-      type: "function",
+      type: 'function',
     };
-    if (openAITool.function?.parameters?.type === "object") {
-      if (!("properties" in openAITool.function.parameters)) {
-        openAITool.function.parameters["properties"] = {};
+    if (openAITool.function?.parameters?.type === 'object') {
+      if (!('properties' in openAITool.function.parameters)) {
+        openAITool.function.parameters['properties'] = {};
       }
     }
     return openAITool;
@@ -27,18 +27,18 @@ export function convertTools(tools: Tool[]): OpenAI.ChatCompletionTool[] {
 
 export async function getCompletion(
   messages: OpenAI.ChatCompletionMessageParam[],
-  tools: OpenAI.ChatCompletionTool[]
+  tools: OpenAI.ChatCompletionTool[],
 ): Promise<OpenAI.ChatCompletionAssistantMessageParam> {
   return fetch(`${import.meta.env.VITE_API_URL}/api/chat`, {
     body: JSON.stringify({
       messages,
-      model: "gpt-4o",
+      model: 'gpt-4o',
       tools: tools,
     }),
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
-    method: "POST",
+    method: 'POST',
   })
     .then(async (resp) => {
       if (resp.ok) {
@@ -47,29 +47,29 @@ export async function getCompletion(
       } else {
         console.error(await resp.text());
         return {
-          content: "There was an error processing your message.",
-          role: "assistant",
+          content: 'There was an error processing your message.',
+          role: 'assistant',
         };
       }
     })
     .catch((err) => {
       console.error(err);
       return {
-        content: "There was an error processing your message.",
-        role: "assistant",
+        content: 'There was an error processing your message.',
+        role: 'assistant',
       };
     });
 }
 
 export async function callTools(
   message: OpenAI.ChatCompletionMessageParam,
-  callTool: UseMcpResult["callTool"],
+  callTool: UseMcpResult['callTool'],
   updateReadToolCallStack?: (
     toolCall?: OpenAI.ChatCompletionMessageToolCall
-  ) => void
+  ) => void,
 ): Promise<OpenAI.ChatCompletionMessageParam[]> {
   if (
-    message.role !== "assistant" ||
+    message.role !== 'assistant' ||
     message.tool_calls === undefined ||
     message.tool_calls.length === 0
   )
@@ -78,14 +78,14 @@ export async function callTools(
   const toolMessages: OpenAI.ChatCompletionToolMessageParam[] = [];
   for (const tool_call of message.tool_calls) {
     if (
-      tool_call.function.name.startsWith("list") ||
-      tool_call.function.name.startsWith("get") ||
-      tool_call.function.name.startsWith("search")
+      tool_call.function.name.startsWith('list') ||
+      tool_call.function.name.startsWith('get') ||
+      tool_call.function.name.startsWith('search')
     ) {
       updateReadToolCallStack?.(tool_call);
       const result = await callTool(
         tool_call.function.name,
-        JSON.parse(tool_call.function.arguments)
+        JSON.parse(tool_call.function.arguments),
       )
         .then((res) => res as CallToolResult)
         .catch((err) => {
@@ -94,7 +94,7 @@ export async function callTools(
             content: [
               {
                 text: err instanceof McpError ? err.message : (err as string),
-                type: "text",
+                type: 'text',
               } as TextContent,
             ],
             isError: true,
@@ -102,10 +102,10 @@ export async function callTools(
         });
       toolMessages.push({
         content: result.content
-          .filter((block) => block.type === "text")
+          .filter((block) => block.type === 'text')
           .map((block) => block.text)
-          .join("\n"),
-        role: "tool",
+          .join('\n'),
+        role: 'tool',
         tool_call_id: tool_call.id,
       });
     }
@@ -116,13 +116,13 @@ export async function callTools(
 export async function respondToUser(
   messages: OpenAI.ChatCompletionMessageParam[],
   tools: OpenAI.ChatCompletionTool[],
-  callTool: UseMcpResult["callTool"],
+  callTool: UseMcpResult['callTool'],
   updateReadToolCallStack?: (
     toolCall?: OpenAI.ChatCompletionMessageToolCall
-  ) => void
+  ) => void,
 ): Promise<OpenAI.ChatCompletionMessageParam[]> {
   const lastMessage = messages[messages.length - 1];
-  if (lastMessage.role !== "user") return [];
+  if (lastMessage.role !== 'user') return [];
 
   let lastAssistantMessage: OpenAI.ChatCompletionAssistantMessageParam =
     await getCompletion(messages, tools);
@@ -140,7 +140,7 @@ export async function respondToUser(
     const toolMessages = await callTools(
       lastAssistantMessage,
       callTool,
-      updateReadToolCallStack
+      updateReadToolCallStack,
     );
     newMessages.push(...toolMessages);
 
@@ -148,7 +148,7 @@ export async function respondToUser(
 
     lastAssistantMessage = await getCompletion(
       [...messages, ...newMessages],
-      tools
+      tools,
     );
     newMessages.push(lastAssistantMessage);
   }

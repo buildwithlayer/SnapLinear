@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
-import type { FileWithPath } from "react-dropzone";
+import { createContext, type ReactNode, useContext, useState } from 'react';
+import type { FileWithPath } from 'react-dropzone';
 
 interface FileContextType {
   file?: FileWithPath;

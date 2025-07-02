@@ -1,14 +1,14 @@
-import Button from "./components/Button";
-import ToolTypeBadge from "./components/ToolTypeBadge";
-import { useCommentsContext } from "./contexts/CommentsContext";
-import { type CreateComment } from "./linearTypes";
-import DeleteIcon from "./assets/delete.svg?react";
-import CheckIcon from "./assets/check.svg?react";
-import IssuesIcon from "./assets/issues.svg?react";
-import { ClipLoader } from "react-spinners";
+import { ClipLoader } from 'react-spinners';
+import CheckIcon from './assets/check.svg?react';
+import DeleteIcon from './assets/delete.svg?react';
+import IssuesIcon from './assets/issues.svg?react';
+import Button from './components/Button';
+import ToolTypeBadge from './components/ToolTypeBadge';
+import { useCommentsContext } from './contexts/CommentsContext';
+import { type CreateComment } from './linearTypes';
 
 const Comments = () => {
-  const { unreviewedComments, commentsLoading } = useCommentsContext();
+  const { commentsLoading, unreviewedComments } = useCommentsContext();
 
   return (
     <div className="flex flex-col gap-4 items-center w-full h-full">
@@ -30,12 +30,12 @@ const Comments = () => {
 };
 
 interface CommentProps {
-  toolCallId: string;
   comment: CreateComment;
+  toolCallId: string;
 }
 
-const Comment = ({ toolCallId, comment }: CommentProps) => {
-  const { approveComment, rejectComment, approveLoading } =
+const Comment = ({ comment, toolCallId }: CommentProps) => {
+  const { approveComment, approveLoading, rejectComment } =
     useCommentsContext();
 
   return (

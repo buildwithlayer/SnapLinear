@@ -1,37 +1,37 @@
+import type { ChatCompletionMessageToolCall } from 'openai/resources/index.mjs';
 import {
   createContext,
+  type ReactNode,
   useContext,
   useEffect,
   useState,
-  type ReactNode,
-} from "react";
-import { useMessagesContext } from "./MessagesContext";
-import { useMcpContext } from "./McpContext";
-import toast from "react-hot-toast";
-import type { ChatCompletionMessageToolCall } from "openai/resources/index.mjs";
+} from 'react';
+import toast from 'react-hot-toast';
 import {
-  isUpdateIssue,
   type CreateIssue,
+  isUpdateIssue,
   type UpdateIssue,
-} from "../linearTypes";
-import { useLinearContext } from "./LinearContext";
+} from '../linearTypes';
+import { useLinearContext } from './LinearContext';
+import { useMcpContext } from './McpContext';
+import { useMessagesContext } from './MessagesContext';
 
 interface IssuesContextType {
-  issues: Record<string, CreateIssue | UpdateIssue>;
-  issuesLoading: boolean;
-  unreviewedIssues: Record<string, CreateIssue | UpdateIssue>;
   approveIssue: (toolCallId: string) => Promise<void>;
   approveLoading: string[];
+  issues: Record<string, CreateIssue | UpdateIssue>;
+  issuesLoading: boolean;
   rejectIssue: (toolCallId: string) => void;
+  unreviewedIssues: Record<string, CreateIssue | UpdateIssue>;
 }
 
 const IssuesContext = createContext<IssuesContextType>({
-  issues: {},
-  issuesLoading: false,
-  unreviewedIssues: {},
   approveIssue: async () => {},
   approveLoading: [],
+  issues: {},
+  issuesLoading: false,
   rejectIssue: () => {},
+  unreviewedIssues: {},
 });
 
 export const IssuesProvider = ({ children }: { children: ReactNode }) => {
@@ -42,9 +42,13 @@ export const IssuesProvider = ({ children }: { children: ReactNode }) => {
   const [issueToolCalls, setIssueToolCalls] = useState<
     ChatCompletionMessageToolCall[]
   >([]);
-  const [approvedIssues, setApprovedIssues] = useState<Record<string, any>>({});
+  const [approvedIssues, setApprovedIssues] = useState<
+    Record<string, CreateIssue | UpdateIssue>
+  >({});
   const [approveLoading, setApproveLoading] = useState<string[]>([]);
-  const [rejectedIssues, setRejectedIssues] = useState<Record<string, any>>({});
+  const [rejectedIssues, setRejectedIssues] = useState<
+    Record<string, CreateIssue | UpdateIssue>
+  >({});
 
   const [issues, setIssues] = useState<
     Record<string, CreateIssue | UpdateIssue>
@@ -61,17 +65,17 @@ export const IssuesProvider = ({ children }: { children: ReactNode }) => {
         issueToolCalls.map(async (toolCall) => {
           const issueData = JSON.parse(toolCall.function.arguments);
           if (isUpdateIssue(issueData)) {
-            const getIssueResponse = await callTool?.("get_issue", {
+            const getIssueResponse = await callTool?.('get_issue', {
               id: issueData.id,
             });
             if (getIssueResponse) {
               issueData.originalIssue = JSON.parse(
-                getIssueResponse.content[0].text
+                getIssueResponse.content[0].text,
               );
             }
           }
           return { [toolCall.id]: issueData };
-        })
+        }),
       );
 
       const issuesObject = Object.assign({}, ...resolvedIssues);
@@ -80,37 +84,37 @@ export const IssuesProvider = ({ children }: { children: ReactNode }) => {
 
     fetchIssues()
       .catch((error) => {
-        console.error("Error fetching issues:", error);
-        toast.error("Could not fetch issues");
+        console.error('Error fetching issues:', error);
+        toast.error('Could not fetch issues');
       })
       .finally(() => {
         setIssuesLoading(false);
       });
-  }, [issueToolCalls, callTool]);
+  }, [issueToolCalls, callTool, issues]);
 
   const unreviewedIssues = Object.fromEntries(
     Object.entries(issues).filter(([toolCallId]) => {
       return !approvedIssues[toolCallId] && !rejectedIssues[toolCallId];
-    })
+    }),
   );
 
   useEffect(() => {
     if (incompleteToolCalls && Object.entries(issues).length === 0) {
       const issueToolCalls = incompleteToolCalls.filter(
         (toolCall) =>
-          toolCall.function.name === "create_issue" ||
-          toolCall.function.name === "update_issue"
+          toolCall.function.name === 'create_issue' ||
+          toolCall.function.name === 'update_issue',
       );
 
       setIssueToolCalls(issueToolCalls);
-      localStorage.setItem("issueToolCalls", JSON.stringify(issueToolCalls));
+      localStorage.setItem('issueToolCalls', JSON.stringify(issueToolCalls));
     }
-  }, [incompleteToolCalls, issues.length]);
+  }, [incompleteToolCalls, issues]);
 
   useEffect(() => {
-    const storedIssueToolCalls = localStorage.getItem("issueToolCalls");
-    const storedApprovedIssues = localStorage.getItem("approvedIssues");
-    const storedRejectedIssues = localStorage.getItem("rejectedIssues");
+    const storedIssueToolCalls = localStorage.getItem('issueToolCalls');
+    const storedApprovedIssues = localStorage.getItem('approvedIssues');
+    const storedRejectedIssues = localStorage.getItem('rejectedIssues');
 
     if (storedIssueToolCalls) {
       const parsedIssues = JSON.parse(storedIssueToolCalls);
@@ -129,7 +133,7 @@ export const IssuesProvider = ({ children }: { children: ReactNode }) => {
     setApproveLoading((prev) => [...prev, toolCallId]);
     if (issues[toolCallId] && callTool) {
       const toolCall = issueToolCalls.find(
-        (toolCall) => toolCall.id === toolCallId
+        (toolCall) => toolCall.id === toolCallId,
       );
       if (toolCall) {
         try {
@@ -138,7 +142,15 @@ export const IssuesProvider = ({ children }: { children: ReactNode }) => {
             ...args,
             description:
               args.description +
-              `\n\nCreated with [SnapLinear](https://www.snaplinear.app/?utm_source=snaplinear-tasklink&utm_medium=linear+task&utm_campaign=snaplinear)`,
+              '\n\nCreated with [SnapLinear](https://www.snaplinear.app/?utm_source=snaplinear-tasklink&utm_medium=linear+task&utm_campaign=snaplinear)',
+            labelIds: args.labelIds
+              ? args.labelIds.map(
+                  (labelId: string) =>
+                    teams
+                      ?.find((team) => team.id === args.teamId)
+                      ?.issueLabels.find((label) => label.id === labelId)?.id,
+                )
+              : [],
             stateId: args.stateId
               ? teams
                   ?.find((team) => team.id === args.teamId)
@@ -146,14 +158,6 @@ export const IssuesProvider = ({ children }: { children: ReactNode }) => {
                 ? args.stateId
                 : undefined
               : undefined,
-            labelIds: args.labelIds
-              ? args.labelIds.map(
-                  (labelId: string) =>
-                    teams
-                      ?.find((team) => team.id === args.teamId)
-                      ?.issueLabels.find((label) => label.id === labelId)?.id
-                )
-              : [],
           });
           if (toolResponse.isError) {
             throw new Error(toolResponse.content[0].text);
@@ -163,15 +167,15 @@ export const IssuesProvider = ({ children }: { children: ReactNode }) => {
             [toolCallId]: issues[toolCallId],
           }));
           localStorage.setItem(
-            "approvedIssues",
+            'approvedIssues',
             JSON.stringify({
               ...approvedIssues,
               [toolCallId]: issues[toolCallId],
-            })
+            }),
           );
         } catch (error) {
-          console.error("Error approving issue:", error);
-          toast.error("Could not approve issue");
+          console.error('Error approving issue:', error);
+          toast.error('Could not approve issue');
         }
       }
       setApproveLoading((prev) => prev.filter((id) => id !== toolCallId));
@@ -185,11 +189,11 @@ export const IssuesProvider = ({ children }: { children: ReactNode }) => {
         [toolCallId]: issues[toolCallId],
       }));
       localStorage.setItem(
-        "rejectedIssues",
+        'rejectedIssues',
         JSON.stringify({
           ...rejectedIssues,
           [toolCallId]: issues[toolCallId],
-        })
+        }),
       );
     }
   }
@@ -197,12 +201,12 @@ export const IssuesProvider = ({ children }: { children: ReactNode }) => {
   return (
     <IssuesContext.Provider
       value={{
-        issues,
-        issuesLoading,
-        unreviewedIssues,
         approveIssue,
         approveLoading,
+        issues,
+        issuesLoading,
         rejectIssue,
+        unreviewedIssues,
       }}
     >
       {children}

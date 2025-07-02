@@ -1,33 +1,33 @@
-import Button from "./components/Button";
-import ToolTypeBadge from "./components/ToolTypeBadge";
-import { useIssuesContext } from "./contexts/IssuesContext";
+import { ClipLoader } from 'react-spinners';
+import CalendarIcon from './assets/calendar.svg?react';
+import CheckIcon from './assets/check.svg?react';
+import DeleteIcon from './assets/delete.svg?react';
+import GroupIcon from './assets/group.svg?react';
+import PersonIcon from './assets/person.svg?react';
+import PriorityHighIcon from './assets/priority-high.svg?react';
+import PriorityLowIcon from './assets/priority-low.svg?react';
+import PriorityMediumIcon from './assets/priority-medium.svg?react';
+import PriorityNoneIcon from './assets/priority-none.svg?react';
+import PriorityUrgentIcon from './assets/priority-urgent.svg?react';
+import ProjectIcon from './assets/project.svg?react';
+import StatusBacklogIcon from './assets/status-backlog.svg?react';
+import StatusCancelledIcon from './assets/status-cancelled.svg?react';
+import StatusCompletedIcon from './assets/status-completed.svg?react';
+import StatusStartedIcon from './assets/status-started.svg?react';
+import StatusUnstartedIcon from './assets/status-unstarted.svg?react';
+import Button from './components/Button';
+import ToolTypeBadge from './components/ToolTypeBadge';
+import { useIssuesContext } from './contexts/IssuesContext';
+import { useLinearContext } from './contexts/LinearContext';
 import {
   baseIssueToCreateIssue,
-  isUpdateIssue,
   type CreateIssue,
+  isUpdateIssue,
   type UpdateIssue,
-} from "./linearTypes";
-import DeleteIcon from "./assets/delete.svg?react";
-import CheckIcon from "./assets/check.svg?react";
-import PersonIcon from "./assets/person.svg?react";
-import GroupIcon from "./assets/group.svg?react";
-import ProjectIcon from "./assets/project.svg?react";
-import CalendarIcon from "./assets/calendar.svg?react";
-import PriorityNoneIcon from "./assets/priority-none.svg?react";
-import PriorityLowIcon from "./assets/priority-low.svg?react";
-import PriorityMediumIcon from "./assets/priority-medium.svg?react";
-import PriorityHighIcon from "./assets/priority-high.svg?react";
-import PriorityUrgentIcon from "./assets/priority-urgent.svg?react";
-import StatusBacklogIcon from "./assets/status-backlog.svg?react";
-import StatusUnstartedIcon from "./assets/status-unstarted.svg?react";
-import StatusStartedIcon from "./assets/status-started.svg?react";
-import StatusCompletedIcon from "./assets/status-completed.svg?react";
-import StatusCancelledIcon from "./assets/status-cancelled.svg?react";
-import { useLinearContext } from "./contexts/LinearContext";
-import { ClipLoader } from "react-spinners";
+} from './linearTypes';
 
 const Issues = () => {
-  const { unreviewedIssues, issuesLoading } = useIssuesContext();
+  const { issuesLoading, unreviewedIssues } = useIssuesContext();
   const { teams } = useLinearContext();
 
   return (
@@ -59,14 +59,14 @@ const Issues = () => {
 };
 
 interface IssueProps {
-  toolCallId: string;
-  issue: CreateIssue;
   changes?: UpdateIssue;
+  issue: CreateIssue;
+  toolCallId: string;
 }
 
-const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
-  const { approveIssue, rejectIssue, approveLoading } = useIssuesContext();
-  const { users, projects, teams } = useLinearContext();
+const Issue = ({ changes, issue, toolCallId }: IssueProps) => {
+  const { approveIssue, approveLoading, rejectIssue } = useIssuesContext();
+  const { projects, teams, users } = useLinearContext();
 
   const assignee = users?.find((user) => user.id === issue.assigneeId);
   const updatedAssignee = changes
@@ -95,15 +95,15 @@ const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
       ? team.issueLabels.filter((label) => changes.labelIds?.includes(label.id))
       : [];
   const dueDate = issue.dueDate
-    ? new Date(issue.dueDate + "T00:00:00").toLocaleDateString(undefined, {
-        month: "short",
-        day: "numeric",
+    ? new Date(issue.dueDate + 'T00:00:00').toLocaleDateString(undefined, {
+        day: 'numeric',
+        month: 'short',
       })
     : undefined;
   const updatedDueDate = changes?.dueDate
-    ? new Date(changes.dueDate + "T00:00:00").toLocaleDateString(undefined, {
-        month: "short",
-        day: "numeric",
+    ? new Date(changes.dueDate + 'T00:00:00').toLocaleDateString(undefined, {
+        day: 'numeric',
+        month: 'short',
       })
     : undefined;
 
@@ -141,13 +141,13 @@ const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
         <div className="inline gap-2">
           <span
             className={`text-xl font-medium ${
-              changes?.title && "line-through"
+              changes?.title && 'line-through'
             }`}
           >
             {issue.title}
           </span>
           {changes?.title && (
-            <span className={`text-xl font-medium text-yellow-600`}>
+            <span className={'text-xl font-medium text-yellow-600'}>
               {changes.title}
             </span>
           )}
@@ -157,14 +157,14 @@ const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
           {issue.description && issue.description.length > 0 && (
             <span
               className={`text-gray-300 ${
-                changes?.description && "line-through"
+                changes?.description && 'line-through'
               }`}
             >
               {issue.description}
             </span>
           )}
           {changes?.description && (
-            <span className={`text-yellow-600`}>{changes.description}</span>
+            <span className={'text-yellow-600'}>{changes.description}</span>
           )}
         </div>
       </div>
@@ -230,19 +230,19 @@ const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
             label={state.name}
             icon={
               <>
-                {state.type === "backlog" && (
+                {state.type === 'backlog' && (
                   <StatusBacklogIcon className="fill-gray-200 w-4 h-4" />
                 )}
-                {state.type === "unstarted" && (
+                {state.type === 'unstarted' && (
                   <StatusUnstartedIcon className="fill-gray-200 w-4 h-4" />
                 )}
-                {state.type === "started" && (
+                {state.type === 'started' && (
                   <StatusStartedIcon className="fill-gray-200 w-4 h-4" />
                 )}
-                {state.type === "completed" && (
+                {state.type === 'completed' && (
                   <StatusCompletedIcon className="fill-gray-200 w-4 h-4" />
                 )}
-                {state.type === "cancelled" && (
+                {state.type === 'cancelled' && (
                   <StatusCancelledIcon className="fill-gray-200 w-4 h-4" />
                 )}
               </>
@@ -254,19 +254,19 @@ const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
             label={updatedState.name}
             icon={
               <>
-                {updatedState.type === "backlog" && (
+                {updatedState.type === 'backlog' && (
                   <StatusBacklogIcon className="fill-yellow-600 w-4 h-4" />
                 )}
-                {updatedState.type === "unstarted" && (
+                {updatedState.type === 'unstarted' && (
                   <StatusUnstartedIcon className="fill-yellow-600 w-4 h-4" />
                 )}
-                {updatedState.type === "started" && (
+                {updatedState.type === 'started' && (
                   <StatusStartedIcon className="fill-yellow-600 w-4 h-4" />
                 )}
-                {updatedState.type === "completed" && (
+                {updatedState.type === 'completed' && (
                   <StatusCompletedIcon className="fill-yellow-600 w-4 h-4" />
                 )}
-                {updatedState.type === "cancelled" && (
+                {updatedState.type === 'cancelled' && (
                   <StatusCancelledIcon className="fill-yellow-600 w-4 h-4" />
                 )}
               </>
@@ -302,7 +302,7 @@ const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
             icon={
               <PersonIcon
                 className={`w-4 h-4 ${
-                  updatedAssignee ? "fill-yellow-600" : "fill-gray-200"
+                  updatedAssignee ? 'fill-yellow-600' : 'fill-gray-200'
                 }`}
               />
             }
@@ -316,7 +316,7 @@ const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
             icon={
               <ProjectIcon
                 className={`w-4 h-4 ${
-                  updatedAssignee ? "fill-yellow-600" : "fill-gray-200"
+                  updatedAssignee ? 'fill-yellow-600' : 'fill-gray-200'
                 }`}
               />
             }
@@ -370,21 +370,21 @@ const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
 };
 
 const AttributeTag = ({
-  label,
   icon,
+  label,
   updated,
 }: {
-  label?: string;
   icon: React.ReactNode;
+  label?: string;
   updated?: boolean;
 }) => {
   return (
     <div
       className={`flex items-center gap-2 py-1 border rounded-md text-sm ${
         updated
-          ? "text-yellow-600 border-yellow-600"
-          : "text-gray-400 border-gray-700"
-      } ${!label ? "px-1" : "px-2"}`}
+          ? 'text-yellow-600 border-yellow-600'
+          : 'text-gray-400 border-gray-700'
+      } ${!label ? 'px-1' : 'px-2'}`}
     >
       {icon}
       {label && <span>{label}</span>}

@@ -1,32 +1,32 @@
+import type { ChatCompletionMessageToolCall } from 'openai/resources/index.mjs';
 import {
   createContext,
+  type ReactNode,
   useContext,
   useEffect,
   useState,
-  type ReactNode,
-} from "react";
-import { useMessagesContext } from "./MessagesContext";
-import { useMcpContext } from "./McpContext";
-import toast from "react-hot-toast";
-import type { ChatCompletionMessageToolCall } from "openai/resources/index.mjs";
-import type { CreateComment } from "../linearTypes";
+} from 'react';
+import toast from 'react-hot-toast';
+import type { CreateComment } from '../linearTypes';
+import { useMcpContext } from './McpContext';
+import { useMessagesContext } from './MessagesContext';
 
 interface CommentsContextType {
-  comments: Record<string, CreateComment>;
-  commentsLoading: boolean;
-  unreviewedComments: Record<string, CreateComment>;
   approveComment: (toolCallId: string) => Promise<void>;
   approveLoading: string[];
+  comments: Record<string, CreateComment>;
+  commentsLoading: boolean;
   rejectComment: (toolCallId: string) => void;
+  unreviewedComments: Record<string, CreateComment>;
 }
 
 const CommentsContext = createContext<CommentsContextType>({
-  comments: {},
-  commentsLoading: false,
-  unreviewedComments: {},
   approveComment: async () => {},
   approveLoading: [],
+  comments: {},
+  commentsLoading: false,
   rejectComment: () => {},
+  unreviewedComments: {},
 });
 
 export const CommentsProvider = ({ children }: { children: ReactNode }) => {
@@ -36,13 +36,13 @@ export const CommentsProvider = ({ children }: { children: ReactNode }) => {
   const [commentToolCalls, setCommentToolCalls] = useState<
     ChatCompletionMessageToolCall[]
   >([]);
-  const [approvedComments, setApprovedComments] = useState<Record<string, any>>(
-    {}
-  );
+  const [approvedComments, setApprovedComments] = useState<
+    Record<string, CreateComment>
+  >({});
   const [approveLoading, setApproveLoading] = useState<string[]>([]);
-  const [rejectedComments, setRejectedComments] = useState<Record<string, any>>(
-    {}
-  );
+  const [rejectedComments, setRejectedComments] = useState<
+    Record<string, CreateComment>
+  >({});
 
   const [comments, setComments] = useState<Record<string, CreateComment>>({});
   const [commentsLoading, setCommentsLoading] = useState<boolean>(false);
@@ -50,7 +50,7 @@ export const CommentsProvider = ({ children }: { children: ReactNode }) => {
   const unreviewedComments = Object.fromEntries(
     Object.entries(comments).filter(([toolCallId]) => {
       return !approvedComments[toolCallId] && !rejectedComments[toolCallId];
-    })
+    }),
   );
 
   useEffect(() => {
@@ -62,14 +62,14 @@ export const CommentsProvider = ({ children }: { children: ReactNode }) => {
       const resolvedComments = await Promise.all(
         commentToolCalls.map(async (toolCall) => {
           const commentData = JSON.parse(toolCall.function.arguments);
-          const getIssueResponse = await callTool?.("get_issue", {
+          const getIssueResponse = await callTool?.('get_issue', {
             id: commentData.issueId,
           });
           if (getIssueResponse) {
             commentData.issue = JSON.parse(getIssueResponse.content[0].text);
           }
           return { [toolCall.id]: commentData };
-        })
+        }),
       );
 
       const commentsObject = Object.assign({}, ...resolvedComments);
@@ -78,32 +78,32 @@ export const CommentsProvider = ({ children }: { children: ReactNode }) => {
 
     fetchComments()
       .catch((error) => {
-        console.error("Error fetching comments:", error);
-        toast.error("Could not fetch comments");
+        console.error('Error fetching comments:', error);
+        toast.error('Could not fetch comments');
       })
       .finally(() => {
         setCommentsLoading(false);
       });
-  }, [commentToolCalls, callTool]);
+  }, [commentToolCalls, callTool, comments]);
 
   useEffect(() => {
     if (incompleteToolCalls && Object.entries(comments).length === 0) {
       const commentToolCalls = incompleteToolCalls.filter(
-        (toolCall) => toolCall.function.name === "create_comment"
+        (toolCall) => toolCall.function.name === 'create_comment',
       );
 
       setCommentToolCalls(commentToolCalls);
       localStorage.setItem(
-        "commentToolCalls",
-        JSON.stringify(commentToolCalls)
+        'commentToolCalls',
+        JSON.stringify(commentToolCalls),
       );
     }
-  }, [incompleteToolCalls, comments.length]);
+  }, [incompleteToolCalls, comments]);
 
   useEffect(() => {
-    const storedCommentToolCalls = localStorage.getItem("commentToolCalls");
-    const storedApprovedComments = localStorage.getItem("approvedComments");
-    const storedRejectedComments = localStorage.getItem("rejectedComments");
+    const storedCommentToolCalls = localStorage.getItem('commentToolCalls');
+    const storedApprovedComments = localStorage.getItem('approvedComments');
+    const storedRejectedComments = localStorage.getItem('rejectedComments');
 
     if (storedCommentToolCalls) {
       const parsedComments = JSON.parse(storedCommentToolCalls);
@@ -122,13 +122,13 @@ export const CommentsProvider = ({ children }: { children: ReactNode }) => {
     setApproveLoading((prev) => [...prev, toolCallId]);
     if (comments[toolCallId] && callTool) {
       const toolCall = commentToolCalls.find(
-        (toolCall) => toolCall.id === toolCallId
+        (toolCall) => toolCall.id === toolCallId,
       );
       if (toolCall) {
         try {
           const toolResponse = await callTool(
             toolCall.function.name,
-            JSON.parse(toolCall.function.arguments)
+            JSON.parse(toolCall.function.arguments),
           );
           if (toolResponse.isError) {
             throw new Error(toolResponse.content[0].text);
@@ -138,15 +138,15 @@ export const CommentsProvider = ({ children }: { children: ReactNode }) => {
             [toolCallId]: comments[toolCallId],
           }));
           localStorage.setItem(
-            "approvedComments",
+            'approvedComments',
             JSON.stringify({
               ...approvedComments,
               [toolCallId]: comments[toolCallId],
-            })
+            }),
           );
         } catch (error) {
-          console.error("Error approving comment:", error);
-          toast.error("Could not approve comment");
+          console.error('Error approving comment:', error);
+          toast.error('Could not approve comment');
         }
       }
       setApproveLoading((prev) => prev.filter((id) => id !== toolCallId));
@@ -160,11 +160,11 @@ export const CommentsProvider = ({ children }: { children: ReactNode }) => {
         [toolCallId]: comments[toolCallId],
       }));
       localStorage.setItem(
-        "rejectedComments",
+        'rejectedComments',
         JSON.stringify({
           ...rejectedComments,
           [toolCallId]: comments[toolCallId],
-        })
+        }),
       );
     }
   }
@@ -172,12 +172,12 @@ export const CommentsProvider = ({ children }: { children: ReactNode }) => {
   return (
     <CommentsContext.Provider
       value={{
-        comments,
-        commentsLoading,
-        unreviewedComments,
         approveComment,
         approveLoading,
+        comments,
+        commentsLoading,
         rejectComment,
+        unreviewedComments,
       }}
     >
       {children}

@@ -1,13 +1,13 @@
-import { CommentsProvider } from "./contexts/CommentsContext";
-import { useFileContext } from "./contexts/FileContext";
-import { IssuesProvider } from "./contexts/IssuesContext";
-import { LinearProvider } from "./contexts/LinearContext";
-import { McpProvider } from "./contexts/McpContext";
-import { MessagesContext, MessagesProvider } from "./contexts/MessagesContext";
-import { useTranscriptContext } from "./contexts/TranscriptContext";
-import LandingPage from "./LandingPage";
-import Progress from "./Progress";
-import Review from "./Review";
+import { CommentsProvider } from './contexts/CommentsContext';
+import { useFileContext } from './contexts/FileContext';
+import { IssuesProvider } from './contexts/IssuesContext';
+import { LinearProvider } from './contexts/LinearContext';
+import { McpProvider } from './contexts/McpContext';
+import { MessagesContext, MessagesProvider } from './contexts/MessagesContext';
+import { useTranscriptContext } from './contexts/TranscriptContext';
+import LandingPage from './LandingPage';
+import Progress from './Progress';
+import Review from './Review';
 
 const Content = () => {
   const { file } = useFileContext();
