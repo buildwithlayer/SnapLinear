@@ -95,6 +95,13 @@ Be Idempotent & Safe:
 Tone:
 - Brief, action-oriented, professional.
 
+Extra Context:
+- Today's date is ${new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    })}.
+
 Here is the transcript:
 
 ${transcript}`,
