@@ -8,6 +8,7 @@ import {LocalStorageProvider} from './contexts/LocalStorageContext.tsx';
 import {TranscriptProvider} from './contexts/TranscriptContext.tsx';
 import MenuBar from './MenuBar.tsx';
 import OAuthCallback from './OAuthCallback.tsx';
+import { useEffect } from 'react';
 
 function App() {
     const sessionReplayTracking = sessionReplayPlugin({sampleRate: 1});
@@ -19,6 +20,12 @@ function App() {
         },
         serverUrl: `${import.meta.env.VITE_API_URL}/api/amplitude`,
     });
+
+    useEffect(() => {
+        const identify = new amplitude.Identify();
+        identify.setOnce('source', new URL(document.location.toString()).searchParams.get('source') || "unknown");
+        amplitude.identify(identify);
+    }, []);
 
     return (
         <div className="flex flex-col h-screen w-screen">
