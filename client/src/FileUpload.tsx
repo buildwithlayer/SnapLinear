@@ -98,7 +98,7 @@ function FileUpload({demo, splitTestVersion}: {demo: boolean, splitTestVersion?:
                                     <RecordButton
                                         isRecording={recording}
                                         setIsRecording={setRecording}
-                                        handleRecordingComplete={setLocalFile}
+                                        handleRecordingComplete={demo ? setFile : setLocalFile}
                                         splitTestVersion={splitTestVersion}
                                     />
                                 )}

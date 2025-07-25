@@ -245,8 +245,9 @@ export const LocalStorageProvider = ({children}: { children: ReactNode }) => {
 
     const getLocalLinearUsers = () => {
         const linearUsers = localStorage.getItem('linearUsers');
+        if (!linearUsers) return undefined;
         try {
-            const parsedUsers = JSON.parse(linearUsers || '');
+            const parsedUsers = JSON.parse(linearUsers);
             const linearUsersParseResult = z.array(UserSchema).safeParse(parsedUsers);
             return linearUsersParseResult.success ? linearUsersParseResult.data : undefined;
         } catch (error) {
@@ -261,8 +262,9 @@ export const LocalStorageProvider = ({children}: { children: ReactNode }) => {
 
     const getLocalLinearProjects = () => {
         const linearProjects = localStorage.getItem('linearProjects');
+        if (!linearProjects) return undefined;
         try {
-            const parsedProjects = JSON.parse(linearProjects || '');
+            const parsedProjects = JSON.parse(linearProjects);
             const linearProjectsParseResult = z.array(ProjectSchema).safeParse(parsedProjects);
             return linearProjectsParseResult.success ? linearProjectsParseResult.data : undefined;
         } catch (error) {
@@ -277,8 +279,9 @@ export const LocalStorageProvider = ({children}: { children: ReactNode }) => {
 
     const getLocalLinearTeams = () => {
         const linearTeams = localStorage.getItem('linearTeams');
+        if (!linearTeams) return undefined;
         try {
-            const parsedTeams = JSON.parse(linearTeams || '');
+            const parsedTeams = JSON.parse(linearTeams);
             const linearTeamsParseResult = z.array(TeamSchema).safeParse(parsedTeams);
             return linearTeamsParseResult.success ? linearTeamsParseResult.data : undefined;
         } catch (error) {
